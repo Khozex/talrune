@@ -2,6 +2,11 @@
 
 This is a command-line interface (CLI) tool that translates text from English to Portuguese using the OpenAI GPT-3.5 Turbo model.
 
+##Observation
+TalRune
+
+"Tal" means "speech" in Danish and Norwegian, and "Rune" refers to the ancient Nordic runic writing system.
+
 ## Installation
 
 Before using this CLI, you need to set up an OpenAI API key. Make sure you have [Rust](https://www.rust-lang.org/tools/install) and [Cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html) installed on your system.
