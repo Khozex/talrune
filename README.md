@@ -2,7 +2,7 @@
 
 This is a command-line interface (CLI) tool that translates text from English to Portuguese using the OpenAI GPT-3.5 Turbo model.
 
-##Observation
+## Observation
 TalRune
 
 "Tal" means "speech" in Danish and Norwegian, and "Rune" refers to the ancient Nordic runic writing system.
