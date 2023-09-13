@@ -3,12 +3,12 @@ use std::error::Error;
 use tiktoken_rs::r50k_base;
 use reqwest;
 
-pub async fn make_request_to_gpt(input: String, token: String) -> Result<String, Box<dyn Error>> {
-    let url = "https://api.openai.com/v1/chat/completions";
+pub async fn make_request_to_gpt(input: String, token: String, url: String) -> Result<String, Box<dyn Error>> {
     let bpe = r50k_base().unwrap();
-    let input = bpe.encode_with_special_tokens(&input as &str);
-    if input.len() > 4096 {
-        panic!("Input is too long");
+    let coded_input = bpe.encode_with_special_tokens(&input as &str);
+    if coded_input.len() > 4096 {
+        print!("Input is too long");
+        return Ok("Input is too long".to_string());
     }
     let client = reqwest::Client::new();
 
@@ -33,6 +33,7 @@ pub async fn make_request_to_gpt(input: String, token: String) -> Result<String,
         print!("Message translated: {}", message_content);
         Ok(message_content.to_string())
     } else {
-        Err("Failed to extract message content".into())
+        print!("Error: {}", response_text);
+        Ok(response_text)
     }
 }
