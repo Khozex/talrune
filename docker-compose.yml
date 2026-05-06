@@ -1,0 +1,29 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+    # GPU NVIDIA (descomente se tiver GPU + nvidia-container-toolkit):
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+
+  talrune:
+    build: .
+    depends_on:
+      - ollama
+    environment:
+      TALRUNE_PROVIDER: ollama
+      TALRUNE_BASE_URL: http://ollama:11434
+      TALRUNE_MODEL: llama3.2
+    stdin_open: true
+    tty: true
+
+volumes:
+  ollama_models:

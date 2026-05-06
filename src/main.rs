@@ -1,25 +1,46 @@
+use std::io::{self, Read};
+use std::process::ExitCode;
 
-use std::env;
-use std::io;
-pub mod translator;
-
-
+use clap::Parser;
+use talrune::cli::Cli;
+use talrune::config::Config;
+use talrune::llm;
+use talrune::translator;
 
 #[tokio::main]
-pub async fn main() {
-    let variable = "GPT_TOKEN";
-    let token = env::var(variable).expect("Expected a token in the environment");
-    let pre_input = "Traduza para o português:";
+async fn main() -> ExitCode {
+    let cli = Cli::parse();
+
+    let config = match Config::resolve(cli) {
+        Ok(c) => c,
+        Err(e) => {
+            eprintln!("config error: {e}");
+            return ExitCode::from(2);
+        }
+    };
+
     let mut input = String::new();
-    io::stdin().read_line(&mut input).unwrap();
-    if input == "" || input == "\n" || input == "\r\n" {
-        print!("Input is empty");
-        return;
+    if let Err(e) = io::stdin().read_to_string(&mut input) {
+        eprintln!("failed to read stdin: {e}");
+        return ExitCode::from(1);
     }
-    input = format!("{} {}", pre_input, input);
-    let url = "https://api.openai.com/v1/chat/completions".to_string();
-    translator::make_request_to_gpt(input, token, url).await.unwrap();
+
+    let trimmed = input.trim();
+    if trimmed.is_empty() {
+        eprintln!("input is empty");
+        return ExitCode::from(1);
+    }
+
+    let backend = llm::build(&config);
+
+    match translator::translate(trimmed, &config.target_lang, backend.as_ref()).await {
+        Ok(translation) => {
+            println!("{translation}");
+            ExitCode::SUCCESS
+        }
+        Err(e) => {
+            eprintln!("error: {e}");
+            ExitCode::from(1)
+        }
+    }
 }
-
-
-
