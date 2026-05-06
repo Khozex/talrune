@@ -45,7 +45,7 @@ async fn rejects_input_above_token_limit() {
         "testkey".to_string(),
     );
 
-    let long = std::fs::read_to_string("tests/lorem.txt").unwrap();
+    let long = "lorem ipsum ".repeat(5000);
     let err = backend.complete(&long).await.unwrap_err();
 
     assert!(matches!(err, talrune::llm::LlmError::InputTooLong { .. }));

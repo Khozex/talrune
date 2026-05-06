@@ -1,12 +1,13 @@
 use async_trait::async_trait;
 use serde_json::{json, Value};
-use tiktoken_rs::r50k_base;
+use tiktoken_rs::cl100k_base;
 
 use super::{LlmBackend, LlmError};
 
 const MAX_TOKENS: usize = 4096;
 
 pub struct OpenAiBackend {
+    client: reqwest::Client,
     url: String,
     model: String,
     api_key: String,
@@ -14,16 +15,21 @@ pub struct OpenAiBackend {
 
 impl OpenAiBackend {
     pub fn new(url: String, model: String, api_key: String) -> Self {
-        Self { url, model, api_key }
+        Self {
+            client: reqwest::Client::new(),
+            url,
+            model,
+            api_key,
+        }
     }
 }
 
 #[async_trait]
 impl LlmBackend for OpenAiBackend {
     async fn complete(&self, prompt: &str) -> Result<String, LlmError> {
-        let bpe = r50k_base()
+        let bpe = cl100k_base()
             .map_err(|e| LlmError::Provider(format!("tokenizer init: {e}")))?;
-        let tokens = bpe.encode_with_special_tokens(prompt);
+        let tokens = bpe.encode_ordinary(prompt);
         if tokens.len() > MAX_TOKENS {
             return Err(LlmError::InputTooLong { tokens: tokens.len(), max: MAX_TOKENS });
         }
@@ -34,9 +40,8 @@ impl LlmBackend for OpenAiBackend {
             "temperature": 0.7
         });
 
-        let response = reqwest::Client::new()
+        let response = self.client
             .post(&self.url)
-            .header("Content-Type", "application/json")
             .header("Authorization", format!("Bearer {}", self.api_key))
             .json(&body)
             .send()
