@@ -1,3 +1,4 @@
+pub mod ollama;
 pub mod openai;
 
 use async_trait::async_trait;
