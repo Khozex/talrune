@@ -1,54 +1,70 @@
-# Translate CLI
+# talrune
 
-This is a command-line interface (CLI) tool that translates text from English to Portuguese using the OpenAI GPT-3.5 Turbo model.
+CLI Rust de tradução via LLM, **local-first**: usa Ollama por padrão e
+suporta OpenAI como alternativa.
 
-## Observation
-TalRune
+> **Talrune** — *Tal* significa "fala" em dinamarquês/norueguês,
+> *Rune* remete à escrita rúnica nórdica.
 
-"Tal" means "speech" in Danish and Norwegian, and "Rune" refers to the ancient Nordic runic writing system.
+## Quick start (Docker compose — caminho mais fácil)
 
-## Installation
-
-Before using this CLI, you need to set up an OpenAI API key. Make sure you have [Rust](https://www.rust-lang.org/tools/install) and [Cargo](https://doc.rust-lang.org/cargo/getting-started/installation.html) installed on your system.
-
-1. Clone the repository:
-
-   ```sh
-   git clone https://github.com/khozex/translate-cli.git
-   cd translate-cli
-    ```
-2. Set your OpenAI API key as an environment variable:
-
-    ```
-    export GPT_TOKEN=your-api-key
-    ```
-3. Build the CLI:
-
-    ```
-    cargo build --release
-    ```
-
-## Usage
-Once the CLI is running, you can enter English text that you want to translate to Portuguese. The CLI will make use of the OpenAI API to provide you with the translation.
-
-Simply follow the prompts to provide your input.
-
-Example:
-
-```
-echo "Hello, my name is John." | ./target/release/translate-cli
+```sh
+git clone https://github.com/khozex/talrune.git
+cd talrune
+docker compose up -d ollama
+make pull-model               # baixa llama3.2 (~2GB)
+echo "Hello, world" | docker compose run --rm talrune
 ```
 
-Output:
+## Instalação nativa
 
+Pré-requisitos: [Rust](https://www.rust-lang.org/tools/install) e
+[Ollama](https://ollama.com/) instalados.
+
+```sh
+ollama pull llama3.2
+cargo install --path .
+echo "Hello, world" | talrune
 ```
-Olá, meu nome é John.
+
+## Uso
+
+```sh
+echo "Hello, world" | talrune                      # default: ollama, llama3.2, pt
+echo "Olá, mundo"   | talrune --target-lang en     # traduz pra inglês
+echo "Hello"        | talrune --model qwen2.5      # outro modelo do Ollama
+echo "Hello"        | talrune --provider openai    # usa OpenAI (precisa OPENAI_API_KEY)
+talrune --help                                     # todas as flags
 ```
 
-## License
+## Provider OpenAI
 
-Distributed under the MIT License. 
+```sh
+export OPENAI_API_KEY=sk-...
+echo "Hello" | talrune --provider openai
+```
 
+`GPT_TOKEN` ainda funciona como fallback, mas está deprecated.
 
+## Configuração
 
+Toda flag tem env var equivalente. Ordem de precedência: **flag > env > default**.
 
+| Flag             | Env                    | Default                                                   |
+|------------------|------------------------|-----------------------------------------------------------|
+| `--provider`     | `TALRUNE_PROVIDER`     | `ollama`                                                  |
+| `--model`        | `TALRUNE_MODEL`        | `llama3.2` (ollama) / `gpt-4o-mini` (openai)              |
+| `--target-lang`  | `TALRUNE_TARGET_LANG`  | `pt`                                                      |
+| `--base-url`     | `TALRUNE_BASE_URL`     | `http://localhost:11434` / endpoint OpenAI oficial        |
+| (sem flag)       | `OPENAI_API_KEY`       | obrigatório se `--provider openai`                        |
+
+## Desenvolvimento
+
+```sh
+make test               # mocks (rápido)
+make test-integration   # smoke real, requer Ollama rodando
+```
+
+## Licença
+
+MIT.
