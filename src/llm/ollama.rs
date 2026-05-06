@@ -35,7 +35,7 @@ impl LlmBackend for OllamaBackend {
             .send()
             .await
             .map_err(|e| LlmError::Connection {
-                url: self.base_url.clone(),
+                url: url.clone(),
                 hint: format!(
                     "{e}. Ollama não está rodando? Tente 'ollama serve' ou 'docker compose up ollama'."
                 ),
