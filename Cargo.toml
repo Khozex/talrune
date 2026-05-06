@@ -1,22 +1,17 @@
 [package]
 name = "talrune"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
-reqwest = { version = "0.11", features = ["blocking", "json"] }
+reqwest = { version = "0.11", features = ["json"] }
 tokio = { version = "1", features = ["full"] }
-serde = "1.0"
+serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 tiktoken-rs = "0.5.3"
+clap = { version = "4", features = ["derive", "env"] }
+async-trait = "0.1"
+thiserror = "1"
 
 [dev-dependencies]
-mockito = "0.29"
 httpmock = "0.6"
-
-[tests]
-name = "tests"
-path = "main_test.rs"
-
