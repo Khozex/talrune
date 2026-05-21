@@ -39,7 +39,10 @@ pub fn build(config: &Config) -> Box<dyn LlmBackend> {
         Provider::Openai => Box::new(openai::OpenAiBackend::new(
             config.base_url.clone(),
             config.model.clone(),
-            config.api_key.clone().expect("api_key required for OpenAI; resolve() must enforce"),
+            config
+                .api_key
+                .clone()
+                .expect("api_key required for OpenAI; resolve() must enforce"),
         )),
     }
 }

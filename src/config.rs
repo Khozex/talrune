@@ -36,18 +36,25 @@ impl Config {
         let api_key = match provider {
             Provider::Openai => {
                 let key = env::var("OPENAI_API_KEY")
-                    .or_else(|_| env::var("GPT_TOKEN").map(|k| {
-                        eprintln!(
-                            "warning: GPT_TOKEN is deprecated, use OPENAI_API_KEY instead"
-                        );
-                        k
-                    }))
+                    .or_else(|_| {
+                        env::var("GPT_TOKEN").inspect(|_| {
+                            eprintln!(
+                                "warning: GPT_TOKEN is deprecated, use OPENAI_API_KEY instead"
+                            );
+                        })
+                    })
                     .map_err(|_| ConfigError::MissingApiKey)?;
                 Some(key)
             }
             Provider::Ollama => None,
         };
 
-        Ok(Self { provider, model, target_lang, base_url, api_key })
+        Ok(Self {
+            provider,
+            model,
+            target_lang,
+            base_url,
+            api_key,
+        })
     }
 }

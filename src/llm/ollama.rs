@@ -42,15 +42,17 @@ impl LlmBackend for OllamaBackend {
             })?;
 
         let status = response.status();
-        let text = response.text().await
+        let text = response
+            .text()
+            .await
             .map_err(|e| LlmError::Decode(e.to_string()))?;
 
         if !status.is_success() {
             return Err(LlmError::Provider(format!("HTTP {status}: {text}")));
         }
 
-        let parsed: Value = serde_json::from_str(&text)
-            .map_err(|e| LlmError::Decode(format!("{e}: {text}")))?;
+        let parsed: Value =
+            serde_json::from_str(&text).map_err(|e| LlmError::Decode(format!("{e}: {text}")))?;
         parsed["message"]["content"]
             .as_str()
             .map(str::to_string)

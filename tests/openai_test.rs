@@ -56,7 +56,8 @@ async fn maps_401_to_auth_error() {
     let server = MockServer::start();
     server.mock(|when, then| {
         when.method(POST).path("/chat/completions");
-        then.status(401).body(r#"{"error":{"message":"invalid key"}}"#);
+        then.status(401)
+            .body(r#"{"error":{"message":"invalid key"}}"#);
     });
 
     let backend = OpenAiBackend::new(
