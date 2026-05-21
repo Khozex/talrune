@@ -6,10 +6,7 @@ use talrune::llm::LlmBackend;
 #[tokio::test]
 #[ignore]
 async fn translates_with_real_ollama() {
-    let backend = OllamaBackend::new(
-        "http://localhost:11434".to_string(),
-        "llama3.2".to_string(),
-    );
+    let backend = OllamaBackend::new("http://localhost:11434".to_string(), "llama3.2".to_string());
 
     let result = backend
         .complete("Translate to Portuguese, only the translation: Hello")

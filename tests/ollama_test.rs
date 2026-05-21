@@ -50,7 +50,10 @@ async fn maps_connection_refused_to_connection_error() {
     let err = backend.complete("hi").await.unwrap_err();
     match err {
         talrune::llm::LlmError::Connection { hint, .. } => {
-            assert!(hint.contains("Ollama"), "hint should mention Ollama: {hint}");
+            assert!(
+                hint.contains("Ollama"),
+                "hint should mention Ollama: {hint}"
+            );
         }
         other => panic!("expected Connection error, got {other:?}"),
     }
